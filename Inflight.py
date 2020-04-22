@@ -10,14 +10,11 @@ from turtle import *    # Imports functions from the turtle library that allow u
 from tkinter import *
 from math import *
 
-#CONSTANTS
-G = 6.6741*10**-11
-#gravitational constant
+
 
 # The Astronomical Unit = distance from earth to the sun [meters]
 AU = 146230000000
 SCALE = 75.0 / AU       # Scale 1 AU to 30 pixels
-
 
 class planet(Turtle):
     """

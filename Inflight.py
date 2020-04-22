@@ -5,16 +5,14 @@ Authors: Callen Reid, Ashley Fan, Cher Xu, Efrain Munoz
 Date: 04/15/20
 """
 
-import turtle           # Imports library that allows user to alter a turtle. A turtle is something that has a position and a direction, and can draw lines
-from turtle import *    # Imports functions from the turtle library that allow user to alter the turtle
+import turtle
+import constants
 from tkinter import *
 from math import *
 
 
 
-# The Astronomical Unit = distance from earth to the sun [meters]
-AU = 146230000000
-SCALE = 75.0 / AU       # Scale 1 AU to 30 pixels
+SCALE = 75.0 / constants.AU       # Scale 1 AU to 30 pixels
 
 class planet(Turtle):
     """
@@ -68,12 +66,53 @@ class spaceship(planet):
     Attribute yloc: the y location of the spaceship
     Invariant: yloc is a float
     """
-    vx = vy = 0.0
-    xloc = yloc = 0.0
-    name=''
+    def getX(self):
+        """
+        Returns the x location of the rocket
+        """
 
+    def setX(self,x):
+        """
+        Sets the ship object 
+        """
 
-    def __init__(self,xloc,yLoc):
+    def getY(self):
+        """
+        Returns the y location of the rocket
+        """
+
+    def setY(self,y):
+        """
+        """
+
+    def getXVel(self):
+        """
+        """
+    def setXVel(self,v):
+        """
+        """
+    def getAng(self):
+        """
+        """
+    def setAng(self,a):
+        """
+        """
+
+    def __init__(self,alt,vel,ang):
+        """
+        Intiales a space spaceship
+
+        Parameter alt: The initial altitude of the rocket
+        Precondition: alt is a float > 0.0
+
+        Parameter vel: The magnitude of the inital velocity of the rocket
+        Precondition: vel is a float > 0.0
+
+        Parameter ang: The angle of launch with respect to the a straingt line
+        path from Earth to Mars
+        Precondition: ang is a float in the range [0.0..360.0]
+        """
+
     def thrust(self):
         self.vx=AU * -0.02 / 86400
 

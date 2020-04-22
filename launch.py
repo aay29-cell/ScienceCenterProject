@@ -1,10 +1,12 @@
 from constants import *
 import matplotlib.pyplot as plt
 import numpy as np
+import tkinter as tk
 
 
 class Rocket:
 
+    crashed = False
 
     def __init__(self):
         self.mass_rocket = MASS_ROCKET
@@ -30,23 +32,24 @@ class Rocket:
         v = [self.velocity]
         a = [self.acceleration]
 
-        launch_fuel = self.fuel  # calculate what percent of total fuel used for launch
+        launch_fuel = self.mass_fuel  # calculate what percent of total fuel used for launch
 
         for nt in np.arange(dt, tmax, dt):
             force = self.thrust() + self.wind() - self.gravity_force() - self.drag()
-            if self.fuel > 0: self.consume_fuel()
+            self.consume_fuel()
+            if self.mass_fuel < 0: crashed = True
             a.append(force / (self.mass_rocket + self.mass_fuel))
             v.append(a[-1]*dt + v[-1])
             s.append(0.5*a[-1]*dt**2 + v[-1]*dt + s[-1])
 
-        self.visualize(s, v, a, nt, dt)
+        # self.visualize(s, v, a, nt, dt)
 
 
     def consume_fuel(self):
         """
         Consumes fuel for a single time step
         """
-        self.fuel -= 0.5
+        self.mass_fuel -= 0.5
 
     def gravity_force(self):
         """
@@ -69,7 +72,7 @@ class Rocket:
 
 
     def thrust(self):
-        return 1
+        return BOOSTER_THRUST
 
 
     def wind(self):
@@ -136,3 +139,14 @@ class Rocket:
 
 rocket = Rocket()
 rocket.launch(100, 0.1)
+
+# GUI
+# https://www.python-course.eu/tkinter_entry_widgets.php
+window = tk.Tk()
+window.geometry('375x125')
+
+label = tk.Label(window, text='Entry value of G').grid(row=0)
+input = tk.Entry().grid(row=0, column=1)
+next = tk.Button(text='Next').grid(row=1, column=1)
+
+window.mainloop()

@@ -1,3 +1,8 @@
+"""
+To use:
+    add `from constants import *` to header
+"""
+
 
 # Physical Constants
 GRAVITATIONAL_CONSTANT = 6.67 * 10**-11

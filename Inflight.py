@@ -5,19 +5,14 @@ Authors: Callen Reid, Ashley Fan, Cher Xu, Efrain Munoz
 Date: 04/15/20
 """
 
-import turtle           # Imports library that allows user to alter a turtle. A turtle is something that has a position and a direction, and can draw lines
-from turtle import *    # Imports functions from the turtle library that allow user to alter the turtle
+import turtle
+import constants
 from tkinter import *
 from math import *
 
-#CONSTANTS
-G = 6.6741*10**-11
-#gravitational constant
 
-# The Astronomical Unit = distance from earth to the sun [meters]
-AU = 146230000000
-SCALE = 75.0 / AU       # Scale 1 AU to 30 pixels
 
+SCALE = 75.0 / constants.AU       # Scale 1 AU to 30 pixels
 
 class planet(Turtle):
     """
@@ -58,25 +53,112 @@ class planet(Turtle):
 class spaceship(planet):
     """
     Class to represent a spaceship
-
-    Attribute vx: x component of velocity of the spaceship
-    Invariant: vx is a float
-
-    Attribute vy: y component of velocity of the spaceship
-    Invariant: vy is a float
-
-    Attribute xloc: the x location of the spaceship
-    Invariant: xloc is a float
-
-    Attribute yloc: the y location of the spaceship
-    Invariant: yloc is a float
     """
-    vx = vy = 0.0
-    xloc = yloc = 0.0
-    name=''
+    # Attribute xloc: the x location of the spaceship
+    # Invariant: xloc is a float >= 0.0 & <= 800.0
+    #
+    # Attribute yloc: the y location of the spaceship
+    # Invariant: yloc is a float >= 0.0 & <= 800.0
+    #
+    # Attribute xVel: the magnitude of the x-component of velocity of the spaceship
+    # Invariant: xVel is a float >= 0.0
+    #
+    # Attribute yVel: the magnitude of the y-component of velocity of the spaceship
+    # Invariant: yVel is a float >= 0.0
+    #
+    # Attribute fuel: the remaining fuel in the spaceship
+    # Invariant: fuel is a float >= 0.0
 
 
-    def __init__(self,xloc,yLoc):
+    def getX(self):
+        """
+        Returns the x location of the spaceship object
+        """
+        return self.xloc
+
+    def setX(self,x):
+        """
+        Sets the x-location of the spaceship object
+
+        Parameter x: The x-location of the spaceship object
+        Precondition: x is a float >= 0.0 & <= 800.0
+        """
+        assert isinstance(x,float), 'Invalid type for x, x must be a float'
+        assert (x>=0.0 and x<=800.0), 'Invalid value for x, x must be between 0 and 800 inclusive'
+        self.xloc = x
+
+    def getY(self):
+        """
+        Returns the y location of the spaceship object
+        """
+        return self.yloc
+
+    def setY(self,y):
+        """
+        Sets the y location of the spaceship object
+
+        Parameter y: The y-location of the spaceship object
+        Precondition: y is a float >= 0.0 & <= 800.0
+        """
+        assert isinstance(y,float), 'Invalid type for y, y must be a float'
+        assert (y>=0.0 and y<=800.0), 'Invalid value for y, y must be between 0 and 800 inclusive'
+        self.yloc = y
+
+    def getXVel(self):
+        """
+        Returns the x-velocity of the spaceship object
+        """
+        return self.vx
+
+    def setXVel(self,vx):
+        """
+        Sets the x-velocity of the spaceship object
+
+        Parameter vx: The x-velocity of the spaceship object
+        Precondtion: vx is a float >=0.0
+        """
+        assert isinstance(vx,float), 'Invalid type for vx, vx must be a float'
+        assert (vx>=0.0), 'Invalid value for vx, vx must be greater than 0.0'
+    def getYVel(self):
+        """
+        Returns the y-velocity of the spaceship object
+        """
+        return self.vy
+    def setXVel(self,vy):
+        """
+        Sets the y-velocity of the spaceship object
+
+        Parameter vy: The y-velocity of the spaceship object
+        Precondtion: vy is a float >=0.0
+        """
+    def getFuel(self):
+        """
+        Returns the amount of remaining fuel in the spaceship object
+        """
+        return self.fuel
+    def setFuel(self,f):
+        """
+        Sets the amount of fuel in the spaeship object
+
+        Parameter f: The amount of fuel in the spaceship object
+        Precondition: f is a float >=0.0
+        """
+
+
+    def __init__(self,alt,vel,ang):
+        """
+        Intiales a space spaceship
+
+        Parameter alt: The initial altitude of the rocket
+        Precondition: alt is a float > 0.0
+
+        Parameter vel: The magnitude of the inital velocity of the rocket
+        Precondition: vel is a float > 0.0
+
+        Parameter ang: The angle of launch with respect to the positive x-axis
+        Precondition: ang is a float in the range [0.0..360.0]
+        """
+
     def thrust(self):
         self.vx=AU * -0.02 / 86400
 

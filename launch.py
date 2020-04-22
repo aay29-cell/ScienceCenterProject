@@ -6,9 +6,9 @@ import numpy as np
 class Rocket:
 
 
-    def __init__(self, mass, fuel):
-        self.mass = mass
-        self.fuel = fuel
+    def __init__(self):
+        self.mass_rocket = MASS_ROCKET
+        self.mass_fuel = MASS_FUEL
         self.altitude = 0.0
         self.velocity = 0.0
         self.acceleration = 0.0
@@ -35,7 +35,7 @@ class Rocket:
         for nt in np.arange(dt, tmax, dt):
             force = self.thrust() + self.wind() - self.gravity_force() - self.drag()
             if self.fuel > 0: self.consume_fuel()
-            a.append(force / (self.mass + self.fuel))
+            a.append(force / (self.mass_rocket + self.mass_fuel))
             v.append(a[-1]*dt + v[-1])
             s.append(0.5*a[-1]*dt**2 + v[-1]*dt + s[-1])
 
@@ -52,7 +52,7 @@ class Rocket:
         """
         Calculates the force of gravity currently acting on the rocket
         """
-        return GRAVITATIONAL_CONSTANT * (self.mass + self.fuel) * MASS_EARTH / (RADIUS_EARTH + self.altitude)**2
+        return GRAVITATIONAL_CONSTANT * (self.mass_rocket + self.mass_fuel) * MASS_EARTH / (RADIUS_EARTH + self.altitude)**2
 
 
     def drag(self):
@@ -134,5 +134,5 @@ class Rocket:
         plt.show()
 
 
-rocket = Rocket(10,1,1,1)
+rocket = Rocket()
 rocket.launch(100, 0.1)

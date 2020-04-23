@@ -142,8 +142,8 @@ class spaceship(launch.Rocket,planet):
         self.s = alt
         self.v = vel
         self.a = angle
-        self.xloc = xCoord + math.cos(angle)*alt
-        self.yloc = yCord + math.sin(angle)*alt
+        self.setX(xCoord + math.cos(angle)*alt)
+        self.setY(yCord + math.sin(angle)*alt)
         planet.__init__(self)
         launch.Rocket.__init__(self)
 

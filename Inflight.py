@@ -171,12 +171,30 @@ class spaceship(launch.Rocket,planet):
     def thrust(self):
         self.vx=AU * -0.02 / 86400
 
+    def attraction(self, other):
+        rx = other.xloc - self.xloc
+        ry = other.yloc-self.yloc
+        r = math.sqrt((rx**2+ry**2))
+
+        f = GRAVITATIONAL_CONSTANT*((MASS_ROCKET+self.getFuel())*other.mass)/r**2
+
+        theta = math.atan2(ry,rx)
+        fx = math.cos(theta)*f
+        fy = math.sin(theta)*f
+        return fx,fy
+
 def loop(system):
     timestep = 1*24*3600
+
+    saturnV.pendown()
+
     while not landOrFail:
+        force = {}
         for body in system:
-            body.goto(body.xloc*SCALE, body.yloc*SCALE)
-            body.pendown()
+            total_fx = total_fy = 0.0
+            fx, fy = saturnV.attraction(body)
+            total_fx += fx
+            total_fy += fy
 
 def sucessOrFail(system):
     """
@@ -255,7 +273,7 @@ def main():
     saturnV.color('black')
     saturnV.shapesize(0.3,0.3,1)
 
-    loop([sun, mercury, venus, earth, mars,saturnV])
+    loop([earth, mars])
 
 
 if __name__ == '__main__':          # The code starts here

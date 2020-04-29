@@ -25,7 +25,7 @@ class Rocket:
         dt : int
             the time between each time step
         """
-        nt = int(dt * tmax)
+        nt = int(tmax / dt)
         s, v, a = np.zeros(nt), np.zeros(nt), np.zeros(nt)
         s[0] = 0.0
         v[0] = 0.0
@@ -35,6 +35,7 @@ class Rocket:
 
         for i in range(1, nt):
             force = self.force_thrust() - self.force_gravity(altitude=s[i-1]) - self.force_drag(altitude=s[i-1], velocity=v[i-1])
+            print(i, self.force_thrust(), self.force_gravity(altitude=s[i-1]), self.force_drag(altitude=s[i-1], velocity=v[i-1]))
             self.consume_fuel()
             if self.mass_fuel < 0: 
                 crashed = True
@@ -42,14 +43,14 @@ class Rocket:
             v[i] = a[i-1] * dt + v[i-1]
             s[i] = 0.5 * a[i-1] * dt**2 + v[i-1] * dt + s[i-1]
 
-        self.visualize(s, v, a, ts, dt)
+        self.visualize(s, v, a, i, dt)
 
 
     def consume_fuel(self):
         """
         Consumes fuel for a single time step
         """
-        self.fuel -= 0.5
+        self.mass_fuel -= 0.5
 
     def force_gravity(self, altitude):
         """
@@ -138,7 +139,7 @@ class Rocket:
         """
         f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, figsize=(8,8))
         f.tight_layout(pad=3.0)
-        x = np.arange(0,nt+dt,dt)
+        x = np.arange(0, int(len(s)*dt), dt)
 
         ax1.plot(x, s, 'b')
         ax1.set_ylabel('Altitude')

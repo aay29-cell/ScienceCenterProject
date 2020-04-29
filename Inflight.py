@@ -98,7 +98,7 @@ class spaceship(launch.Rocket,planet):
         assert isinstance(vx, float), 'Invalid type for vx, vx must be a float'
         assert (vx >= 0.0), 'Invalid value for vx, vx must be greater than 0.0'
         self.xVel = vx
-        
+
     def getYVel(self):
         """
         Returns the y-velocity of the spaceship object
@@ -133,11 +133,11 @@ class spaceship(launch.Rocket,planet):
         assert (vy >= 0.0), 'Invalid value for f, f must be greater than 0.0'
         self.fuel = f
 
-    def __init__(self, alt, vel, angle, xCoord, yCoord):
+    def __init__(self, alt, vel, angle, fuel, xCoord, yCoord):
         """
         Intiales a space spaceship
 
-        Parameter alt: The initial altitude of the rocket
+        Parameter alt: The initial altitude of the rocket w.r.t Earth
         Precondition: alt is a float > 0.0
 
         Parameter vel: The magnitude of the inital velocity of the rocket
@@ -145,12 +145,26 @@ class spaceship(launch.Rocket,planet):
 
         Parameter ang: The angle of launch with respect to the positive x-axis
         Precondition: ang is a float in the range [0.0..360.0]
+
+        Parameter fuel: The amount of remaining fuel in the rocket
+        Preconditoin: Fuel is a float >= 0.0
         """
-        self.s = alt
-        self.v = vel
-        self.a = angle
+        assert isinstance(alt,float), 'Invalid type for alt, alt must be a float'
+        assert alt > 0.0, 'Invalid value for alt, alt must be greater than 0.0'
+
+        assert isinstance(ang,float), 'Invalid type for alt, alt must be a float'
+        assert (ang >= 0.0 and ang <= 360.0, 'Invalid value for alt, alt must be in the range [0.0..360.0]'
+
+        assert isinstance(fuel,float), 'Invalid type for fuel, fuel must be a float'
+        assert alt > fuel, 'Invalid value for fuel, fuel must be greater than 0.0'
+        # Dont think these are necessary since we only use these values in the
+        # init
+        # self.s = alt
+        # self.v = vel
+        # self.a = angle
         self.setX(xCoord + math.cos(angle)*alt)
         self.setY(yCoord + math.sin(angle)*alt)
+        self.setFuel(fuel)
         planet.__init__(self)
         launch.Rocket.__init__(self)
 

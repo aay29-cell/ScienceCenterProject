@@ -5,7 +5,9 @@ import math
 #from Inflight import *
 from launch import *
 from contants import *
+import Rocket
 
+rocket = Rocket()
 
 # Parameters
 r_init = 99*(10**6) # m distance away from planet during landing/docking stage ### Will have to change

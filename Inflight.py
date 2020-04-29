@@ -10,7 +10,7 @@ import launch
 from constants import *
 from turtle import *
 
-SCALE = 225.0 / AU       # Scale 1 AU to 30 pixels
+SCALE = 225.0 / constants.AU
 
 class planet(Turtle):
     """
@@ -171,14 +171,40 @@ class spaceship(launch.Rocket,planet):
     def thrust(self):
         self.vx=AU * -0.02 / 86400
 
+    def attraction(self, other):
+        rx = other.xloc - self.xloc
+        ry = other.yloc-self.yloc
+        r = math.sqrt((rx**2+ry**2))
+
+        f = GRAVITATIONAL_CONSTANT*((MASS_ROCKET+self.getFuel())*other.mass)/r**2
+
+        theta = math.atan2(ry,rx)
+        fx = math.cos(theta)*f
+        fy = math.sin(theta)*f
+        return fx,fy
+
 def loop(system):
     timestep = 1*24*3600
-    while True:
+
+    saturnV.pendown()
+
+    while not landOrFail:
+        force = {}
         for body in system:
-            body.goto(body.xloc*SCALE, body.yloc*SCALE)
-            body.pendown()
+            total_fx = total_fy = 0.0
+            fx, fy = saturnV.attraction(body)
+            total_fx += fx
+            total_fy += fy
 
-
+def sucessOrFail(system):
+    """
+    Method to detmermine if the rocket reaches its destination or misses it
+    """
+    rocketCoords = (system[5].getX(),system[5].getY())
+    marsCoords   = (system[4].getX()+math.cos(marsAng)*marsAlt),system[4].getY()+math.cos(marsAng)*marsAlt))
+    if rocketCoords.equals(marsCoords):
+        return True
+    elif rocketCoords[0]<marsCoords[0]
 def main():
 
     turtle.setup(800, 800)          # Set the window size to 800 by 800 pixels
@@ -247,8 +273,33 @@ def main():
     saturnV.color('black')
     saturnV.shapesize(0.3,0.3,1)
 
-    loop([sun, mercury, venus, earth, mars])
+    loop([earth, mars])
 
 
 if __name__ == '__main__':          # The code starts here
     main()                          # Goes to the function called main (line 82)
+
+#Possible function to know if it reachers mars with edits
+# def contains(self,point):
+#         """
+#         Checks whether this shape contains the point
+#
+#         By default, this method just checks the bounding box of the shape.
+#
+#         **Warning**: Using this method on a rotated object may slow down your framerate.
+#
+#         :param point: the point to check
+#         :type point: :class:`Point2` or a pair of numbers
+#
+#         :return: True if the shape contains this point
+#         :rtype:  ``bool``
+#         """
+#         import numpy as np
+#         if isinstance(point,Point2):
+#             point = (point.x,point.y)
+#         assert is_num_tuple(point,2), "%s is not a valid point" % repr(point)
+#
+#         if self._rotate.angle != 0.0:
+#             point = self.matrix.inverse()._transform(point[0],point[1])
+#
+#         return abs(point[0]-self.x) < self.width/2.0 and abs(point[1]-self.y) < self.height/2.0

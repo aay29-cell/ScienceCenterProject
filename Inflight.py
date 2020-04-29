@@ -10,7 +10,7 @@ import launch
 from constants import *
 from turtle import *
 
-SCALE = 75.0 / AU       # Scale 1 AU to 30 pixels
+SCALE = 225.0 / AU       # Scale 1 AU to 30 pixels
 
 class planet(Turtle):
     """
@@ -30,8 +30,8 @@ class planet(Turtle):
 
 class spaceship(launch.Rocket,planet):
     """
-        Class to represent a spaceship
-        """
+    Class to represent a spaceship
+    """
 
     # Attribute xloc: the x location of the spaceship
     # Invariant: xloc is a float >= 0.0 & <= 800.0
@@ -153,7 +153,7 @@ class spaceship(launch.Rocket,planet):
         assert alt > 0.0, 'Invalid value for alt, alt must be greater than 0.0'
 
         assert isinstance(ang,float), 'Invalid type for alt, alt must be a float'
-        assert (ang >= 0.0 and ang <= 360.0, 'Invalid value for alt, alt must be in the range [0.0..360.0]'
+        assert (ang >= 0.0 and ang <= 360.0), 'Invalid value for alt, alt must be in the range [0.0..360.0]'
 
         assert isinstance(fuel,float), 'Invalid type for fuel, fuel must be a float'
         assert alt > fuel, 'Invalid value for fuel, fuel must be greater than 0.0'
@@ -173,10 +173,10 @@ class spaceship(launch.Rocket,planet):
 
 def loop(system):
     timestep = 1*24*3600
-
-    for body in system:
-        body.goto(body.xloc*SCALE, body.yloc*SCALE)
-        body.pendown()
+    while True:
+        for body in system:
+            body.goto(body.xloc*SCALE, body.yloc*SCALE)
+            body.pendown()
 
 
 def main():
@@ -191,7 +191,7 @@ def main():
     sun.color('yellow')
     sun.shape('circle')
     sun.diameter = 1.3914 * 10**6
-    sun.shapesize(2.0,2.0,1)
+    sun.shapesize(5.0,5.0,1)
 
     mercury = planet()
     mercury.name = 'Mercury'
@@ -199,7 +199,7 @@ def main():
     mercury.penup()
     mercury.color('gray')
     mercury.shape('circle')
-    mercury.shapesize(0.2,0.2,1)
+    mercury.shapesize(0.5,0.5,1)
     mercury.diameter = 2440*2
     mercury.yloc = (1 * AU) *  -0.4608453269808703
     mercury.xloc = (1 * AU) *  -0.06333487572394930
@@ -212,7 +212,7 @@ def main():
     venus.penup()
     venus.color('Khaki')
     venus.shape('circle')
-    venus.shapesize(0.6,0.6,1)
+    venus.shapesize(1.5,1.5,1)
     venus.diameter = 6051.893*2
     venus.yloc = (0.7262658 * AU) *  0.0525483
     venus.xloc = (0.7262658 * AU) *  0.7232002
@@ -224,7 +224,7 @@ def main():
     earth.penup()
     earth.color('green')
     earth.shape('circle')
-    earth.shapesize(0.6,0.6,1)
+    earth.shapesize(1.5,1.5,1)
     earth.diameter = 12742
     earth.yloc = (1 * AU) *   0.96756
     earth.xloc = (1 * AU) *  -0.17522
@@ -235,7 +235,7 @@ def main():
     mars.penup()
     mars.color('red')
     mars.shape('circle')
-    mars.shapesize(0.5,0.5,1)
+    mars.shapesize(1.25,1.25,1)
     mars.diameter = 3389.92*2
     mars.yloc = (1 * AU) *  -0.857574644771996
     mars.xloc = (1 * AU) *  -1.320107604952232
@@ -247,7 +247,7 @@ def main():
     saturnV.color('black')
     saturnV.shapesize(0.3,0.3,1)
 
-    loop([sun, mercury, venus, earth, mars, saturnV])
+    loop([sun, mercury, venus, earth, mars])
 
 
 if __name__ == '__main__':          # The code starts here

@@ -9,7 +9,8 @@ GRAVITATIONAL_CONSTANT = 6.67 * 10**-11
 MASS_EARTH = 5.9724 * 10**24  # kg
 MASS_MARS = 0.64171 * 10**24  # kg
 RADIUS_EARTH = 6.378 * 10**6  # m
-AU = 146230000000 #m
+AU = 146230000000  # m
+ESCAPE_VELOCITY = 7800  # m/s
 
 # Rocket Constants
 # Source: https://www.spacex.com/sites/spacex/files/making_life_multiplanetary-2017.pdf

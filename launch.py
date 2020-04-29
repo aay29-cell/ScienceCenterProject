@@ -5,13 +5,13 @@ import numpy as np
 
 class Rocket:
 
+    crashed = False
+    in_orbit = True
 
     def __init__(self):
         self.mass_rocket = MASS_ROCKET
         self.mass_fuel = MASS_FUEL
-        self.altitude = 0.0
-        self.velocity = 0.0
-        self.acceleration = 0.0
+        self.pitch_angle = np.pi / 2
 
 
     def launch(self, tmax, dt):
@@ -26,24 +26,41 @@ class Rocket:
             the time between each time step
         """
         nt = int(tmax / dt)
-        s, v, a = np.zeros(nt), np.zeros(nt), np.zeros(nt)
-        s[0] = 0.0
-        v[0] = 0.0
-        a[0] = 0.0
-
+        s, v, a = np.zeros(nt), np.zeros(nt), np.zeros(nt)  # Position, velocity, acceleration
+        fg, fd, ft = np.zeros(nt), np.zeros(nt), np.zeros(nt)  # Force gravity, drag, thrust
+ 
         launch_fuel = self.mass_fuel  # calculate what percent of total fuel used for launch
 
         for i in range(1, nt):
-            force = self.force_thrust() - self.force_gravity(altitude=s[i-1]) - self.force_drag(altitude=s[i-1], velocity=v[i-1])
-            print(i, self.force_thrust(), self.force_gravity(altitude=s[i-1]), self.force_drag(altitude=s[i-1], velocity=v[i-1]))
+            
+            # calculate all relevant forces
+            fg[i] = self.force_gravity(altitude=s[i-1])
+            fd[i] = self.force_drag(altitude=s[i-1], velocity=v[i-1])
+            ft[i] = self.force_thrust(time=i*dt, force_gravity=fg[i], force_drag=fd[i], altitude=s[i-1])
+            force = ft[i] - fg[i] - fd[i]
+            
+            # consumer fuel
             self.consume_fuel()
             if self.mass_fuel < 0: 
                 crashed = True
+
+            # Begin pitch maneuver between in time interval [160:400] seconds
+            self.tilt_maneuver(i*dt)
+
+            # Calculate updated acceleration, velocity
             a[i] = force / (self.mass_rocket + self.mass_fuel)
             v[i] = a[i-1] * dt + v[i-1]
-            s[i] = 0.5 * a[i-1] * dt**2 + v[i-1] * dt + s[i-1]
 
-        self.visualize(s, v, a, i, dt)
+            # Calculate altitude based on pitch angle and current escape velocity
+            if v[i-1] > ESCAPE_VELOCITY:
+                self.in_orbit = False
+            if self.in_orbit:
+                s[i] = np.sin(self.pitch_angle) * (0.5 * a[i-1] * dt**2 + v[i-1] * dt) + s[i-1]
+            else:
+                s[i] = s[i-1]
+                break
+        
+        self.visualize(s, v, a, i, dt, fg, fd, ft)
 
 
     def consume_fuel(self):
@@ -78,21 +95,39 @@ class Rocket:
         return 0.5 * DRAG_COEFF * ORTH_SURFACE_AREA * self.rho(altitude) * velocity**2
 
 
-    def force_thrust(self):
-        return BOOSTER_THRUST
-
-
-    def wind(self, altitude):
+    def force_thrust(self, time, force_gravity, force_drag, altitude):
         """
-        Returns the force of wind acting on the rocket
+        Returns the current thrust of the rocket
+
+        Source
+        ------
+        WIKI:
+            https://upload.wikimedia.org/wikipedia/commons/2/2c/Apollo17_Ascent_Trajectory.pdf
+        """
+        if time < 160:
+            G_force = 0.017 * time + 1
+        elif time < 560:
+            G_force = .0018 * time + 0.6
+        elif time < 760:
+            G_force = 0.001 * time + 0.5
+        else:
+            G_force = 0.0
+        G = GRAVITATIONAL_CONSTANT * MASS_EARTH / (RADIUS_EARTH + altitude)**2
+        thrust = (MASS_ROCKET + self.mass_fuel) * G_force * G + force_drag + force_gravity
+        return thrust if thrust < BOOSTER_THRUST else BOOSTER_THRUST
+
+
+    def tilt_maneuver(self, time):
+        """
+        Changes pitch angle of rocket to orbit earth until reached escape velocity
 
         Parameters
         ----------
-        altitude:
-            the altitude to find wind velocity
+        time :
+            the time in seconds after liftoff
         """
-        wind_velocity = 0
-        return 0.5 * self.rho(altitude) * wind_velocity**2 * ORTH_SURFACE_AREA
+        if time > 160 and time < 400:
+            self.pitch_angle -= np.pi / 4800
 
 
     def rho(self, altitude):
@@ -122,7 +157,19 @@ class Rocket:
         return p / (0.2869 * (T + 273.1))
 
 
-    def visualize(self, s, v, a, nt, dt):
+    def calculate_g(self, s):
+        """
+        Generate a list of values of G
+
+        Parameters
+        ----------
+        s : list
+            the altitude of rocket at each time step
+        """
+        return [GRAVITATIONAL_CONSTANT * MASS_EARTH / (RADIUS_EARTH + altitude)**2 for altitude in s]
+
+
+    def visualize(self, s, v, a, nt, dt, fg, fd, ft):
         """
         Parameters
         ----------
@@ -136,26 +183,28 @@ class Rocket:
             the number of time steps
         dt : int
             the time between each time step
+        fg : list
+            the force of gravity at eaach time step
         """
         f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, figsize=(8,8))
         f.tight_layout(pad=3.0)
         x = np.arange(0, int(len(s)*dt), dt)
 
-        ax1.plot(x, s, 'b')
-        ax1.set_ylabel('Altitude')
+        ax1.plot(x, s / 1000, 'b')
+        ax1.set_ylabel('Altitude [km]')
         ax1.set_title('Position vs. Time of Rocket Launch')
 
-        ax2.plot(x, v, 'g')
-        ax2.set_ylabel('Velocity')
+        ax2.plot(x, v / 1000, 'g')
+        ax2.set_ylabel('Velocity [km/s]')
         ax2.set_title('Velocity vs. Time of Rocket Launch')
 
-        ax3.plot(x, a, 'r')
-        ax3.set_ylabel('Acceleration')
-        ax3.set_xlabel('Time (sec.)')
+        ax3.plot(x, a / self.calculate_g(s), 'r')
+        ax3.set_ylabel('G Force')
+        ax3.set_xlabel('Time [sec.]')
         ax3.set_title('Acceleration vs. Time of Rocket Launch')
 
         plt.show()
 
 
 rocket = Rocket()
-rocket.launch(100, 0.1)
+rocket.launch(580, 0.1)

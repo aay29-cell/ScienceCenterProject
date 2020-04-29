@@ -31,7 +31,7 @@ class Rocket:
         v[0] = 0.0
         a[0] = 0.0
 
-        launch_fuel = self.fuel  # calculate what percent of total fuel used for launch
+        launch_fuel = self.mass_fuel  # calculate what percent of total fuel used for launch
 
         for i in range(1, nt):
             force = self.force_thrust() - self.force_gravity(altitude=s[i-1]) - self.force_drag(altitude=s[i-1], velocity=v[i-1])
@@ -42,7 +42,7 @@ class Rocket:
             v[i] = a[i-1] * dt + v[i-1]
             s[i] = 0.5 * a[i-1] * dt**2 + v[i-1] * dt + s[i-1]
 
-        # self.visualize(s, v, a, ts, dt)
+        self.visualize(s, v, a, ts, dt)
 
 
     def consume_fuel(self):

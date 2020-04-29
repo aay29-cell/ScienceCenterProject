@@ -25,21 +25,24 @@ class Rocket:
         dt : int
             the time between each time step
         """
+        nt = int(dt * tmax)
+        s, v, a = np.zeros(nt), np.zeros(nt), np.zeros(nt)
+        s[0] = 0.0
+        v[0] = 0.0
+        a[0] = 0.0
 
-        s = [self.altitude]
-        v = [self.velocity]
-        a = [self.acceleration]
+        launch_fuel = self.mass_fuel  # calculate what percent of total fuel used for launch
 
-        launch_fuel = self.fuel  # calculate what percent of total fuel used for launch
+        for i in range(1, nt):
+            force = self.force_thrust() - self.force_gravity(altitude=s[i-1]) - self.force_drag(altitude=s[i-1], velocity=v[i-1])
+            self.consume_fuel()
+            if self.mass_fuel < 0: 
+                crashed = True
+            a[i] = force / (self.mass_rocket + self.mass_fuel)
+            v[i] = a[i-1] * dt + v[i-1]
+            s[i] = 0.5 * a[i-1] * dt**2 + v[i-1] * dt + s[i-1]
 
-        for nt in np.arange(dt, tmax, dt):
-            force = self.thrust() + self.wind() - self.gravity_force() - self.drag()
-            if self.fuel > 0: self.consume_fuel()
-            a.append(force / (self.mass_rocket + self.mass_fuel))
-            v.append(a[-1]*dt + v[-1])
-            s.append(0.5*a[-1]*dt**2 + v[-1]*dt + s[-1])
-
-        self.visualize(s, v, a, nt, dt)
+        self.visualize(s, v, a, ts, dt)
 
 
     def consume_fuel(self):
@@ -48,54 +51,73 @@ class Rocket:
         """
         self.fuel -= 0.5
 
-    def gravity_force(self):
+    def force_gravity(self, altitude):
         """
         Calculates the force of gravity currently acting on the rocket
+
+        Parameters
+        ----------
+        altitude:
+            the current height of the rocket
         """
-        return GRAVITATIONAL_CONSTANT * (self.mass_rocket + self.mass_fuel) * MASS_EARTH / (RADIUS_EARTH + self.altitude)**2
+        return GRAVITATIONAL_CONSTANT * (self.mass_rocket + self.mass_fuel) * MASS_EARTH / (RADIUS_EARTH + altitude)**2
 
 
-    def drag(self):
+    def force_drag(self, altitude, velocity):
         """
         Returns the force of drag curently acting on the rocket
 
         Parameters
         ----------
-        rho : float
-            density of fluid rocket travelling through
+        altitude:
+            the current altitude of the rocket
+        velocity:
+            the current velocity of the rocket in m/s
         """
-        # TODO: model rho with equation based on current altitude
-        return 0.5 * DRAG_COEFF * ORTH_SURFACE_AREA * self.rho() * self.velocity**2
+        return 0.5 * DRAG_COEFF * ORTH_SURFACE_AREA * self.rho(altitude) * velocity**2
 
 
-    def thrust(self):
-        return 1
+    def force_thrust(self):
+        return BOOSTER_THRUST
 
 
-    def wind(self):
+    def wind(self, altitude):
         """
         Returns the force of wind acting on the rocket
+
+        Parameters
+        ----------
+        altitude:
+            the altitude to find wind velocity
         """
         wind_velocity = 0
-        return 0.5 * self.rho() * wind_velocity**2 * ORTH_SURFACE_AREA
+        return 0.5 * self.rho(altitude) * wind_velocity**2 * ORTH_SURFACE_AREA
 
 
-    def rho(self):
+    def rho(self, altitude):
         """
         Calculates the current air density in kg/m^3
 
-        Source: https://www.grc.nasa.gov/WWW/K-12/airplane/atmosmet.html
+        Parameters
+        ----------
+        altitude:
+            the altitude to find desired air density
+
+        Source
+        ------
+        NASA:
+            https://www.grc.nasa.gov/WWW/K-12/airplane/atmosmet.html
         """
         R = 287.05  # Specific gas constant for dry RADIUS_EARTH
-        if self.altitude > 25000:
-            T = -131.21 + 0.003 * self.altitude
+        if altitude > 25000:
+            T = -131.21 + 0.003 * altitude
             p = 2.488 * ((T + 273.1) / 216.6)**-11.388
-        elif self.altitude < 11000:
-            T = 15.04 - 0.00649 * self.altitude
+        elif altitude < 11000:
+            T = 15.04 - 0.00649 * altitude
             p = 101.29 * ((T + 273.1) / 288.08)**5.256
         else:
             T = -56.64
-            p = 22.65 * np.exp(1.73 - 0.000157*self.altitude)
+            p = 22.65 * np.exp(1.73 - 0.000157 * altitude)
         return p / (0.2869 * (T + 273.1))
 
 

@@ -240,6 +240,3 @@ class Rocket:
         ax3.set_title('Acceleration vs. Time of Rocket Launch')
 
         plt.show()
-
-t = Rocket()
-t.launch(1000, 1, t.getY()+RADIUS_EARTH)

@@ -17,3 +17,4 @@ MASS_FUEL = 9.98 * 10**5  # kg
 MASS_ROCKET = 77.111 * 10**3  # kg
 ORTH_SURFACE_AREA = 3.1415 * 4.5**2  # m^2
 DRAG_COEFF = 0.25  # Rough estimate from research
+BOOSTER_THRUST = 5.27 * 10**7  # Newtowns

@@ -1,12 +1,10 @@
 from constants import *
 import matplotlib.pyplot as plt
 import numpy as np
-import tkinter as tk
 
 
 class Rocket:
 
-    crashed = False
 
     def __init__(self):
         self.mass_rocket = MASS_ROCKET
@@ -33,7 +31,7 @@ class Rocket:
         v[0] = 0.0
         a[0] = 0.0
 
-        launch_fuel = self.mass_fuel  # calculate what percent of total fuel used for launch
+        launch_fuel = self.fuel  # calculate what percent of total fuel used for launch
 
         for i in range(1, nt):
             force = self.force_thrust() - self.force_gravity(altitude=s[i-1]) - self.force_drag(altitude=s[i-1], velocity=v[i-1])
@@ -51,7 +49,7 @@ class Rocket:
         """
         Consumes fuel for a single time step
         """
-        self.mass_fuel -= 0.5
+        self.fuel -= 0.5
 
     def force_gravity(self, altitude):
         """
@@ -160,14 +158,3 @@ class Rocket:
 
 rocket = Rocket()
 rocket.launch(100, 0.1)
-
-# GUI
-# https://www.python-course.eu/tkinter_entry_widgets.php
-window = tk.Tk()
-window.geometry('375x125')
-
-label = tk.Label(window, text='Entry value of G').grid(row=0)
-input = tk.Entry().grid(row=0, column=1)
-next = tk.Button(text='Next').grid(row=1, column=1)
-
-window.mainloop()

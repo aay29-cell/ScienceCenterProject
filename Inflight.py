@@ -6,13 +6,11 @@ Date: 04/15/20
 """
 
 import turtle
-import constants
-from tkinter import *
-from math import *
+import launch
+from constants import *
+from turtle import *
 
-
-
-SCALE = 75.0 / constants.AU       # Scale 1 AU to 30 pixels
+SCALE = 75.0 / AU       # Scale 1 AU to 30 pixels
 
 class planet(Turtle):
     """
@@ -30,30 +28,11 @@ class planet(Turtle):
     xloc = yloc = 0.0
     name=''
 
-    # def attraction(self, other, date):
-    #
-    #     # Compute x, y, and total distances between planet and other body
-    #     rx = other.xloc-self.xloc
-    #     ry = other.yloc-self.yloc
-    #     r =  sqrt(rx**2+ry**2)
-    #
-    #     # Compute the overall force
-    #     f = G*self.mass*other.mass/r**2
-    #
-    #     # Compute the angle between the hypotenuse and the adjacent side
-    #     theta = atan2(ry,rx)
-    #     # Compute the x component of the force
-    #     fx = f*cos(theta)
-    #     # Compute the y component of the force
-    #     fy = f*sin(theta)
-    #     # Return the x and y components of the force to the main loop
-    #     return fx, fy
-
-
-class spaceship(planet):
+class spaceship(launch.Rocket,planet):
     """
-    Class to represent a spaceship
-    """
+        Class to represent a spaceship
+        """
+
     # Attribute xloc: the x location of the spaceship
     # Invariant: xloc is a float >= 0.0 & <= 800.0
     #
@@ -69,22 +48,21 @@ class spaceship(planet):
     # Attribute fuel: the remaining fuel in the spaceship
     # Invariant: fuel is a float >= 0.0
 
-
     def getX(self):
         """
         Returns the x location of the spaceship object
         """
         return self.xloc
 
-    def setX(self,x):
+    def setX(self, x):
         """
         Sets the x-location of the spaceship object
 
         Parameter x: The x-location of the spaceship object
         Precondition: x is a float >= 0.0 & <= 800.0
         """
-        assert isinstance(x,float), 'Invalid type for x, x must be a float'
-        assert (x>=0.0 and x<=800.0), 'Invalid value for x, x must be between 0 and 800 inclusive'
+        assert isinstance(x, float), 'Invalid type for x, x must be a float'
+        assert (x >= 0.0 and x <= 800.0), 'Invalid value for x, x must be between 0 and 800 inclusive'
         self.xloc = x
 
     def getY(self):
@@ -93,15 +71,15 @@ class spaceship(planet):
         """
         return self.yloc
 
-    def setY(self,y):
+    def setY(self, y):
         """
         Sets the y location of the spaceship object
 
         Parameter y: The y-location of the spaceship object
         Precondition: y is a float >= 0.0 & <= 800.0
         """
-        assert isinstance(y,float), 'Invalid type for y, y must be a float'
-        assert (y>=0.0 and y<=800.0), 'Invalid value for y, y must be between 0 and 800 inclusive'
+        assert isinstance(y, float), 'Invalid type for y, y must be a float'
+        assert (y >= 0.0 and y <= 800.0), 'Invalid value for y, y must be between 0 and 800 inclusive'
         self.yloc = y
 
     def getXVel(self):
@@ -110,33 +88,37 @@ class spaceship(planet):
         """
         return self.vx
 
-    def setXVel(self,vx):
+    def setXVel(self, vx):
         """
         Sets the x-velocity of the spaceship object
 
         Parameter vx: The x-velocity of the spaceship object
         Precondtion: vx is a float >=0.0
         """
-        assert isinstance(vx,float), 'Invalid type for vx, vx must be a float'
-        assert (vx>=0.0), 'Invalid value for vx, vx must be greater than 0.0'
+        assert isinstance(vx, float), 'Invalid type for vx, vx must be a float'
+        assert (vx >= 0.0), 'Invalid value for vx, vx must be greater than 0.0'
+
     def getYVel(self):
         """
         Returns the y-velocity of the spaceship object
         """
         return self.vy
-    def setXVel(self,vy):
+
+    def setXVel(self, vy):
         """
         Sets the y-velocity of the spaceship object
 
         Parameter vy: The y-velocity of the spaceship object
         Precondtion: vy is a float >=0.0
         """
+
     def getFuel(self):
         """
         Returns the amount of remaining fuel in the spaceship object
         """
         return self.fuel
-    def setFuel(self,f):
+
+    def setFuel(self, f):
         """
         Sets the amount of fuel in the spaeship object
 
@@ -144,33 +126,38 @@ class spaceship(planet):
         Precondition: f is a float >=0.0
         """
 
-
-    def __init__(self,alt,vel,ang):
+    def __init__(self, alt, vel, angle, xCoord, yCoord):
         """
-        Intiales a space spaceship
+            Intiales a space spaceship
 
-        Parameter alt: The initial altitude of the rocket
-        Precondition: alt is a float > 0.0
+            Parameter alt: The initial altitude of the rocket
+            Precondition: alt is a float > 0.0
 
-        Parameter vel: The magnitude of the inital velocity of the rocket
-        Precondition: vel is a float > 0.0
+            Parameter vel: The magnitude of the inital velocity of the rocket
+            Precondition: vel is a float > 0.0
 
-        Parameter ang: The angle of launch with respect to the positive x-axis
-        Precondition: ang is a float in the range [0.0..360.0]
+            Parameter ang: The angle of launch with respect to the positive x-axis
+            Precondition: ang is a float in the range [0.0..360.0]
         """
+        self.s = alt
+        self.v = vel
+        self.a = angle
+        self.setX(xCoord + math.cos(angle)*alt)
+        self.setY(yCord + math.sin(angle)*alt)
+        planet.__init__(self)
+        launch.Rocket.__init__(self)
 
     def thrust(self):
         self.vx=AU * -0.02 / 86400
 
 def loop(system):
-#     timestep=??
-    while(True):
-        for body in system:
-            body.goto(body.xloc*SCALE, body.yloc*SCALE)
+    timestep = 1*24*3600
 
-#     while # Loop used to determine when the spaceship reaches mars (detmerine method to stop if it misses)
+    for body in system:
+        body.goto(body.xloc*SCALE, body.yloc*SCALE)
+        body.pendown()
 
-#
+
 def main():
 
     turtle.setup(800, 800)          # Set the window size to 800 by 800 pixels
@@ -212,7 +199,7 @@ def main():
 
     earth = planet()
     earth.name = 'Earth'
-    earth.mass = 5.97 * 10**24
+    earth.mass = MASS_EARTH
     earth.penup()
     earth.color('green')
     earth.shape('circle')
@@ -223,7 +210,7 @@ def main():
 
     mars = planet()
     mars.name = 'Mars'
-    mars.mass = 6.4171 * 10**23
+    mars.mass = MASS_MARS
     mars.penup()
     mars.color('red')
     mars.shape('circle')
@@ -231,20 +218,16 @@ def main():
     mars.diameter = 3389.92*2
     mars.yloc = (1 * AU) *  -0.857574644771996
     mars.xloc = (1 * AU) *  -1.320107604952232
-#
-#     saturnV = spaceship()
-#     saturnV.name = 'Saturn V'
-#     saturnV.mass = 48600 #From launch team
-#     saturnV.penup()
-#     saturnV.color('grey')
-#     saturnV.shape('classic')
-#     saturnV.shapesize(0.3,0.3,1)
-#     saturnV.diameter = 10 #From launch team
-#     saturnV.yloc = (1 * AU) *   0.97
-#     saturnV.xloc = (1 * AU) *  -0.18
-#     saturnV.vy = AU * -0.0031302  / 86400 #From launch team
-#     saturnV.vx = AU * -0.017201 / 86400 #From launch team
-    loop([sun,mercury,venus,earth,mars])
+
+    saturnV = spaceship(launch.rocket.s,launch.rocket.b,launch.rocket.a,earth.xloc,earth.yloc)
+    saturnV.name = "Saturn V"
+    saturnV.penup()
+    saturnV.shape('classic')
+    saturnV.color('black')
+    saturnV.shapesize(0.3,0.3,1)
+
+    loop([sun, mercury, venus, earth, mars, saturnV])
+
 
 if __name__ == '__main__':          # The code starts here
     main()                          # Goes to the function called main (line 82)

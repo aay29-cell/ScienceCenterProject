@@ -48,15 +48,21 @@ class Rocket:
         mass = [self.mass]
 
         launch_fuel = self.fuel  # calculate what percent of total fuel used for launch
-        consume_fuel = -1
+        consume_fuel = 100
 
         for nt in np.arange(dt, tmax, dt):
-            print(altitude)
-            force = self.getThrust() + self.wind(altitude) - self.gravity_force(altitude) - self.drag(altitude)
-            if self.fuel > 0: self.setFuel(consume_fuel)
-            a.append(force / (self.mass + self.getFuel()))
-            v.append(a[-1]*dt + v[-1])
-            y.append(0.5*a[-1]*dt**2 + v[-1]*dt + y[-1])
+            if self.getFuel() >= 0:
+                self.setFuel(self.getFuel()-consume_fuel)
+            if self.getFuel() - consume_fuel <= 0:
+                self.setThrust(0)
+                self.setFuel(0)
+
+            force = self.getThrust() + self.wind(y[nt-1]) - self.gravity_force(y[nt-1]) + self.drag(y[nt-1])
+            a.append(a[nt-1]+(force / (self.mass + self.getFuel())))
+            v.append(a[nt-1]*dt + v[nt-1])
+            y.append(0.5*a[nt-1]*dt**2 + v[nt-1]*dt + y[nt-1])
+            if y[nt] < 0:
+                break
 
         self.visualize(y, v, a, nt, dt)
 
@@ -173,13 +179,13 @@ class Rocket:
             density of fluid rocket travelling through
         """
         # TODO: model rho with equation based on current altitude
-        return 0.5 * DRAG_COEFF * ORTH_SURFACE_AREA * self.rho(altitude) * self.v**2
+        return 0.5 * DRAG_COEFF * ORTH_SURFACE_AREA * self.rho(altitude) * self.getVelocity()**2
 
     def wind(self, altitude):
         """
         Returns the force of wind acting on the rocket
         """
-        wind_velocity = 0
+        wind_velocity = 1
         return 0.5 * self.rho(altitude) * wind_velocity**2 * ORTH_SURFACE_AREA
 
     def rho(self, altitude):

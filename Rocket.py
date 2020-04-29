@@ -125,7 +125,6 @@ class Rocket:
         """
         Returns: Y-coordinate
         """
-        print(self.y)
         return self.y
 
     def getVelocity(self):
@@ -146,12 +145,6 @@ class Rocket:
         """
         return self.thrust
 
-    def getAcceleration(self):
-        """
-        Returns: Thurst of Rocket
-        """
-        return self.thrust
-
     def getFuel(self):
         """
         Returns: Fuel of Rocket
@@ -160,9 +153,9 @@ class Rocket:
 
     def getMass(self):
         """
-        Returns: Velocity of Rocket
+        Returns: Mass of Rocket (w/out fuel)
         """
-        return self.v
+        return self.mass
 
     def gravity_force(self, altitude):
         """

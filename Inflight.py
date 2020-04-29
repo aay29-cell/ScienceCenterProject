@@ -97,20 +97,24 @@ class spaceship(launch.Rocket,planet):
         """
         assert isinstance(vx, float), 'Invalid type for vx, vx must be a float'
         assert (vx >= 0.0), 'Invalid value for vx, vx must be greater than 0.0'
-
+        self.xVel = vx
+        
     def getYVel(self):
         """
         Returns the y-velocity of the spaceship object
         """
         return self.vy
 
-    def setXVel(self, vy):
+    def setYVel(self, vy):
         """
         Sets the y-velocity of the spaceship object
 
         Parameter vy: The y-velocity of the spaceship object
         Precondtion: vy is a float >=0.0
         """
+        assert isinstance(vy, float), 'Invalid type for vy, vy must be a float'
+        assert (vy >= 0.0), 'Invalid value for vy, vy must be greater than 0.0'
+        self.yVel = vy
 
     def getFuel(self):
         """
@@ -125,25 +129,28 @@ class spaceship(launch.Rocket,planet):
         Parameter f: The amount of fuel in the spaceship object
         Precondition: f is a float >=0.0
         """
+        assert isinstance(f, float), 'Invalid type for f, f must be a float'
+        assert (vy >= 0.0), 'Invalid value for f, f must be greater than 0.0'
+        self.fuel = f
 
     def __init__(self, alt, vel, angle, xCoord, yCoord):
         """
-            Intiales a space spaceship
+        Intiales a space spaceship
 
-            Parameter alt: The initial altitude of the rocket
-            Precondition: alt is a float > 0.0
+        Parameter alt: The initial altitude of the rocket
+        Precondition: alt is a float > 0.0
 
-            Parameter vel: The magnitude of the inital velocity of the rocket
-            Precondition: vel is a float > 0.0
+        Parameter vel: The magnitude of the inital velocity of the rocket
+        Precondition: vel is a float > 0.0
 
-            Parameter ang: The angle of launch with respect to the positive x-axis
-            Precondition: ang is a float in the range [0.0..360.0]
+        Parameter ang: The angle of launch with respect to the positive x-axis
+        Precondition: ang is a float in the range [0.0..360.0]
         """
         self.s = alt
         self.v = vel
         self.a = angle
         self.setX(xCoord + math.cos(angle)*alt)
-        self.setY(yCord + math.sin(angle)*alt)
+        self.setY(yCoord + math.sin(angle)*alt)
         planet.__init__(self)
         launch.Rocket.__init__(self)
 

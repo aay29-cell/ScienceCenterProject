@@ -40,12 +40,12 @@ class Rocket:
             force = ft[i] - fg[i] - fd[i]
             
             # consumer fuel
-            self.consume_fuel()
+            self.consume_fuel(velocity=v[i-1], net_thrust=ft[i-1]-fd[i-1], thrust=ft[i-1], dt=dt)
             if self.mass_fuel < 0: 
                 crashed = True
 
             # Begin pitch maneuver between in time interval [160:400] seconds
-            self.tilt_maneuver(i*dt)
+            self.tilt_maneuver(i*dt, dt)
 
             # Calculate updated acceleration, velocity
             a[i] = force / (self.mass_rocket + self.mass_fuel)
@@ -59,15 +59,31 @@ class Rocket:
             else:
                 s[i] = s[i-1]
                 break
-        
+
         self.visualize(s, v, a, i, dt, fg, fd, ft)
 
 
-    def consume_fuel(self):
+    def consume_fuel(self, velocity, net_thrust, thrust, dt):
         """
         Consumes fuel for a single time step
+
+        Parameters
+        ----------
+        velocity : double
+            the current velocity of the rocket in m/s
+        force : double
+            the current net force on the rocket in N
+        dt : double
+            the time step for this simulation in seconds
         """
-        self.mass_fuel -= 0.5
+        # https://www.grc.nasa.gov/WWW/K-12/airplane/sfc.html
+        # Must take into account flow choking
+        # Does not take into account changing MACH speed as temperature decreases
+        if net_thrust == 0:
+            return
+        mass_flow_rate = METHANE_DENSITY * (velocity if velocity < MACH_1 else MACH_1) * ENGINE_AREA
+        self.mass_fuel -= mass_flow_rate * thrust / net_thrust  * dt
+
 
     def force_gravity(self, altitude):
         """
@@ -117,7 +133,7 @@ class Rocket:
         return thrust if thrust < BOOSTER_THRUST else BOOSTER_THRUST
 
 
-    def tilt_maneuver(self, time):
+    def tilt_maneuver(self, time, dt):
         """
         Changes pitch angle of rocket to orbit earth until reached escape velocity
 
@@ -127,7 +143,7 @@ class Rocket:
             the time in seconds after liftoff
         """
         if time > 160 and time < 400:
-            self.pitch_angle -= np.pi / 4800
+            self.pitch_angle -= np.pi / (480 / dt)
 
 
     def rho(self, altitude):
@@ -186,6 +202,9 @@ class Rocket:
         fg : list
             the force of gravity at eaach time step
         """
+        if not self.in_orbit:
+            s, v, a, fg, fd, ft = map(lambda x: np.trim_zeros(x, 'b'), [s, v, a, fg, fd, ft])
+
         f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, figsize=(8,8))
         f.tight_layout(pad=3.0)
         x = np.arange(0, int(len(s)*dt), dt)
@@ -207,4 +226,4 @@ class Rocket:
 
 
 rocket = Rocket()
-rocket.launch(580, 0.1)
+rocket.launch(800, 1)

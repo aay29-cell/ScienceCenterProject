@@ -10,7 +10,7 @@ import launch
 from constants import *
 from turtle import *
 
-SCALE = 225.0 / constants.AU
+SCALE = 225.0 / AU
 
 class planet(Turtle):
     """
@@ -186,8 +186,10 @@ class spaceship(launch.Rocket,planet):
 def loop(system):
     timestep = 1*24*3600
 
-    saturnV.pendown()
-    for body in system:
+    while True:
+       saturnV.pendown()
+       for body in system:
+           body.goto(body.xloc*SCALE, body.yloc*SCALE)
         total_fx = total_fy = 0.0
         fx, fy = saturnV.attraction(body)
         total_fx += fx
@@ -261,7 +263,7 @@ def main():
     saturnV.color('black')
     saturnV.shapesize(0.3,0.3,1)
 
-    loop([earth, mars])
+    loop([earth, mars, venus, mercury])
 
 
 if __name__ == '__main__':          # The code starts here

@@ -5,6 +5,7 @@ import math
 #from Inflight import *
 from constants import *
 from Rocket import *
+from launch import *
 
 
 # Equations
@@ -46,7 +47,6 @@ time = [0]
 ifinal = -1
 for i in range(1, timestep):
     dm = rocket.getThrust()/v_ex
-    print(i)
     if m[i-1] >= rocket.getMass():
         m.append(m[i-1] + dm * dt)
         rocket.setFuel(rocket.getFuel() + dm)
